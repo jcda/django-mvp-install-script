@@ -80,6 +80,8 @@ the official tutorial
 
 ## Django edge
 
+https://github.com/arocks/edge
+
 ## uWSGI
 
 ## Databases
