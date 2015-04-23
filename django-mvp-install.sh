@@ -52,7 +52,7 @@ export ADMIN_EMAIL =
 # 2: installation of the desired os packages              #
 ###########################################################
 os_package_install(){
-INSTALL_CMD tmux python exim python3-dev fail2ban mutt logwatch
+exec INSTALL_CMD tmux python exim python3-dev fail2ban mutt logwatch
 
 ###########################################################
 # basic setup of fail2ban to be added here                #

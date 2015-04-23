@@ -1,0 +1,12 @@
+list of features to add to the django-mvp-install.sh script
+
+- sanity check
+          - is it a *nix or *nux machine
+          - is there enough space on the computer ?
+
+- setup of logwatch
+          - add nginx logwatch : number connections from different IPs in the last 24 hours
+          - add a query on the database used by django to count the number of new users in the last 24 hours
+
+
+- add an index.html file with a list of useful urls mentioned in the presentation
