@@ -72,10 +72,10 @@ echo "Package install Done"
 ###########################################################
 
 virt_env_install(){
-
+cd $WORK_DIRECTORY
 /usr/bin/pyvenv-3.4 $PROJECT_NAME --without-pip
 cd $PROJECT_NAME
-source $PROJECT_NAME/bin/activate
+source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
 
 echo "Python virtual environment installed"
 }
@@ -86,6 +86,8 @@ echo "Python virtual environment installed"
 
 pip_install(){
 
+source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+cd $WORK_DIRECTORY/$PROJECT_NAME
 curl -O $PYPI_URL
 tar -xzf setuptools-1.1.6.tar.gz
 bin/python setuptools-1.1.6/ez_setup.py
@@ -100,7 +102,8 @@ echo "Pip installation done"
 
 django_install(){
 
-pip install django
+source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+pip install Django==1.7
 
 echo "Django framework installed"
 }
@@ -110,6 +113,7 @@ echo "Django framework installed"
 ###########################################################
 
 uwsgi_install_setup(){
+source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
 pip install uwsgi
 
 # add a script in /etc/init/ with the path to the wsgi
@@ -152,8 +156,8 @@ echo "uwsgi an nginx services installed"
 ###########################################################
 
 django_edge_install(){
-cd $WORK_DIRECTORY
-pip install django
+source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+cd $WORK_DIRECTORY/$PROJECT_NAME
 django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
 
 ###########################################################
@@ -176,6 +180,7 @@ python manage.py migrate
 
 
 echo "django edge installed"
+echo "now you need to create a superuser account "
 }
 
 ###########################################################
@@ -241,10 +246,11 @@ SYNOPSIS
 DESCRIPTION
     all : install the whole shebang following the path defined in the script
     virtualenv
-    nginx
-    uwsgi
+    pip
     django
     edge
+    nginx
+    uwsgi
 
 ENVIRONMENT
 
@@ -276,7 +282,7 @@ case $1 in
      django_edge_install;
      uwsgi_install_setup;
      nginx_install;;
-   "virtenv")
+   "virtualenv")
      virt_env_install;;
    "pip")
      pip_install;;
