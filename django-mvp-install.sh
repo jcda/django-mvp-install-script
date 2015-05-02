@@ -41,18 +41,19 @@
 # 1: Declaration of the environment variables             #
 ###########################################################
 
-export WORK_DIRECTORY = /home/ubuntu
-export PROJECT_NAME = YourProject
-export EDGE_URL = https://github.com/arocks/edge/archive/master.zip
-export PYPI_URL = https://pypi.python.org/packages/source/s/setuptools/setuptools-1.1.6.tar.gz
-export INSTALL_CMD = "sudo apt-get install"
-export ADMIN_EMAIL =
+export WORK_DIRECTORY=$HOME
+export PROJECT_NAME=YourProject
+export EDGE_URL=https://github.com/arocks/edge/archive/master.zip
+export PYPI_URL=https://pypi.python.org/packages/source/s/setuptools/setuptools-1.1.6.tar.gz
+export INSTALL_CMD="sudo apt-get install"
+export ADMIN_EMAIL="root@localhost.localdomain"
 
 ###########################################################
 # 2: installation of the desired os packages              #
 ###########################################################
+
 os_package_install(){
-exec INSTALL_CMD tmux python exim python3-dev fail2ban mutt logwatch
+exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch
 
 ###########################################################
 # basic setup of fail2ban to be added here                #
@@ -63,8 +64,9 @@ exec INSTALL_CMD tmux python exim python3-dev fail2ban mutt logwatch
 ###########################################################
 
 
-
+echo "Package install Done"
 }
+
 ###########################################################
 # 3: installation of the python virtual environment       #
 ###########################################################
@@ -75,6 +77,7 @@ virt_env_install(){
 cd $PROJECT_NAME
 source $PROJECT_NAME/bin/activate
 
+echo "Python virtual environment installed"
 }
 
 ###########################################################
@@ -88,6 +91,7 @@ tar -xzf setuptools-1.1.6.tar.gz
 bin/python setuptools-1.1.6/ez_setup.py
 easy_install pip
 
+echo "Pip installation done"
 }
 
 ###########################################################
@@ -98,6 +102,7 @@ django_install(){
 
 pip install django
 
+echo "Django framework installed"
 }
 
 ###########################################################
@@ -137,6 +142,8 @@ exec $UWSGI --chdir='$WORK_DIRECTORY'/'$PROJECT_NAME'/src/ --env DJANGO_SETTINGS
 
 # to start the whole framework without having to reboot
 sudo service uwsgi start && service nginx restart
+
+echo "uwsgi an nginx services installed"
 }
 
 
@@ -148,25 +155,33 @@ django_edge_install(){
 cd $WORK_DIRECTORY
 pip install django
 django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
+
 ###########################################################
 #    4.a. installation of the packages                    #
 ###########################################################
+
 cd $PROJECT_NAME
 pip install -r requirements.txt
+
 ###########################################################
 #    4.b. migration of the sqlite database                #
 ###########################################################
+
 cd src
 python manage.py migrate
+
 ###########################################################
 #    4.c. creation of a superuser account                 #
 ###########################################################
 
+
+echo "django edge installed"
 }
 
 ###########################################################
 # 5: installation of nginx                                #
 ###########################################################
+
 nginx_install(){
 exec $INSTALL_CMD nginx
 
@@ -210,22 +225,69 @@ sudo ln /etc/nginx/sites-available/$PROJECT_NAME.conf /etc/nginx/sites-enabled/$
 #    creation of the new conf file in the available confs #
 ###########################################################
 
+echo "nginx setup done"
+}
+
+###########################################################
+# Help page                                               #
+###########################################################
+display_help(){
+echo "
+NAME
+    django-mvp-install.sh installs a webserver and a complete
+turn-key framework automagically
+SYNOPSIS
+    django-mvp-install.sh [OPTION]
+DESCRIPTION
+    all : install the whole shebang following the path defined in the script
+    virtualenv
+    nginx
+    uwsgi
+    django
+    edge
+
+ENVIRONMENT
+
+"
 
 }
+
 
 ###########################################################
 # Main execution                                          #
 ###########################################################
 
-if [ -z "$1" ]
-  then
+echo "command " $1 "will be processed"
+case $1 in 
+  "")
+     display_help;;
+     #os_package_install;
+     #virt_env_install;
+     #pip_install;
+     #django_install;
+     #django_edge_install;
+     #uwsgi_install_setup;
+     #nginx_install;
+  "all")
      os_package_install;
      virt_env_install;
      pip_install;
      django_install;
      django_edge_install;
      uwsgi_install_setup;
-     nginx_install;
-  else
-     echo "command " $1 "will be processed"
-  fi
+     nginx_install;;
+   "virtenv")
+     virt_env_install;;
+   "pip")
+     pip_install;;
+   "django")
+     django_install;;
+   "edge")
+     django_edge_install;;
+   "uwsgi")
+     uwsgi_install_setup;;
+   "nginx")
+     nginx_install;;
+   "nuke")
+     echo "you don't want to do that ... not yet";;
+esac
