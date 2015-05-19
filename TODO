@@ -1,4 +1,5 @@
 list of features to add to the django-mvp-install.sh script
+Convert it to python
 
 - sanity check
           - is it a *nix or *nux machine
@@ -10,3 +11,5 @@ list of features to add to the django-mvp-install.sh script
 
 
 - add an index.html file with a list of useful urls mentioned in the presentation
+
+- setup of fail2ban details
