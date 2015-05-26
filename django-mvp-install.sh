@@ -41,7 +41,7 @@
 # 1: Declaration of the environment variables             #
 ###########################################################
 
-export WORK_DIRECTORY=$HOME
+export WORK_DIRECTORY=$HOME/demo
 export PROJECT_NAME=YourProject
 export EDGE_URL=https://github.com/arocks/edge/archive/master.zip
 export PYPI_URL=https://pypi.python.org/packages/source/s/setuptools/setuptools-1.1.6.tar.gz
@@ -265,6 +265,11 @@ ENVIRONMENT
 ###########################################################
 # Main execution                                          #
 ###########################################################
+
+# test of directories
+if [ -d $WORK_DIRECTORY ]
+    mkdir WORK_DIRECTORY
+fi
 
 echo "command " $1 "will be processed"
 case $1 in 

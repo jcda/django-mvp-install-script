@@ -1,5 +1,8 @@
+[TOC]
 # mvp-notes
-Notes and links from the mvp presentation
+Notes and links from an  mvp presentation for Barcelona's Big Data Startups
+Originally I was just a slide presentation with informations to share, then I added a script to automate the installation process of a django framework
+then I added also a bookmark html file with important links to visit.
 
 # Pre requisites
 
