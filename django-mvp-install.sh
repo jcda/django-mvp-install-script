@@ -266,10 +266,26 @@ ENVIRONMENT
 # Main execution                                          #
 ###########################################################
 
-# test of directories
-if [ -d $WORK_DIRECTORY ]
-    mkdir WORK_DIRECTORY
+if [ -f ~/.mvprc ]; then
+source ~/.mvprc
+else
+echo "No .mvprc file in your home directory, one will be created with the default values";
+echo " Feel free to modify the data. ";
+echo "
+export WORK_DIRECTORY=$HOME/demo
+export PROJECT_NAME=YourProject
+export EDGE_URL=https://github.com/arocks/edge/archive/master.zip
+export PYPI_URL=https://pypi.python.org/packages/source/s/setuptools/setuptools-1.1.6.tar.gz
+export INSTALL_CMD="sudo apt-get install"
+export ADMIN_EMAIL="root@localhost.localdomain"
+">> ~/.mvprc ;
 fi
+
+
+# test of directories
+#if [ -d $WORK_DIRECTORY ]
+#    mkdir WORK_DIRECTORY
+#fi
 
 echo "command " $1 "will be processed"
 case $1 in 

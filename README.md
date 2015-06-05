@@ -1,6 +1,7 @@
-[TOC]
+
 # mvp-notes
-Notes and links from an  mvp presentation for Barcelona's Big Data Startups
+#Introduction
+This repository contains Notes and links from an  mvp presentation for Barcelona's Big Data Startups.
 Originally I was just a slide presentation with informations to share, then I added a script to automate the installation process of a django framework
 then I added also a bookmark html file with important links to visit.
 
@@ -14,8 +15,8 @@ http://tldp.org/LDP/Bash-Beginners-Guide/html/index.html
 http://tldp.org/LDP/abs/html/index.html
 
 ## Ssh
-
 http://www.openssh.com
+
 ### note: generate a rsa key to have a password-less connection
 ssh-keygen -t rsa  <return> <return> <return>
 
@@ -57,7 +58,7 @@ Youtube
    personal experience: great assistance. This is a mentorship, not someone doing the work for you.
 
 ### Books
-Oreilly
+http://oreilly.com
 
 # Breaking down the project
 
