@@ -98,9 +98,10 @@ pip_install(){
 
 source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
 cd $WORK_DIRECTORY/$PROJECT_NAME
-curl -O $PYPI_URL
-tar -xzf setuptools-1.1.6.tar.gz
-bin/python setuptools-1.1.6/ez_setup.py
+#curl -O $PYPI_URL
+#tar -xzf setuptools-1.1.6.tar.gz
+#bin/python setuptools-1.1.6/ez_setup.py
+curl https://bootstrap.pypa.io/ez_setup.py -o - | python
 easy_install pip
 
 echo "Pip installation done"
