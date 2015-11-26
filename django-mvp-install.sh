@@ -63,7 +63,7 @@ fi
 ###########################################################
 
 os_package_install(){
-exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch
+exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv
 
 ###########################################################
 # basic setup of fail2ban to be added here                #
@@ -114,7 +114,7 @@ echo "Pip installation done"
 django_install(){
 
 source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-pip install Django==1.7
+pip install Django
 
 echo "Django framework installed"
 }
