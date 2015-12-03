@@ -57,13 +57,21 @@ export ADMIN_EMAIL=\"root@localhost.localdomain\"
  exit
 fi
 
+###########################################################
+# 1.a: basic sanity check for work directory and project  #
+# directory                                               #
+###########################################################
+
+if [-d $WORK_DIRECTORY/$PROJECT_NAME]; then
+  mkdir -p $WORK_DIRECTORY/$PROJECT_NAME
+fi
 
 ###########################################################
 # 2: installation of the desired os packages              #
 ###########################################################
 
 os_package_install(){
-exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv
+exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev
 
 ###########################################################
 # basic setup of fail2ban to be added here                #
@@ -172,27 +180,36 @@ cd $WORK_DIRECTORY/$PROJECT_NAME
 django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
 
 ###########################################################
-#    4.a. installation of the packages                    #
+#         installation of the packages                    #
 ###########################################################
 
 cd $PROJECT_NAME
 pip install -r requirements.txt
 
+##########################################################
+#        installation of the local.env specific to this  #
+#    server                                              #
+##########################################################
+
+echo " installation of the local.env file in settings"
+cp $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/local.sample.env $WORK_DIRECTORY/$WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/local.env
+
 ###########################################################
-#    4.b. migration of the sqlite database                #
+#         migration of the sqlite database                #
 ###########################################################
 
 cd src
 python manage.py migrate
 
 ###########################################################
-#    4.c. creation of a superuser account                 #
+#         creation of a superuser account                 #
 ###########################################################
 
 
 echo "django edge installed"
 echo "now you need to create a superuser account "
 }
+
 
 ###########################################################
 # 5: installation of nginx                                #
