@@ -276,6 +276,7 @@ SYNOPSIS
     django-mvp-install.sh [OPTION]
 DESCRIPTION
     all : install the whole shebang following the path defined in the script
+    os
     virtualenv
     pip
     django
@@ -301,7 +302,7 @@ ENVIRONMENT
 #fi
 
 echo "command " $1 "will be processed"
-case $1 in 
+case $1 in
   "")
      display_help;;
      #os_package_install;
@@ -319,6 +320,8 @@ case $1 in
      django_edge_install;
      uwsgi_install_setup;
      nginx_install;;
+   "os")
+     os_package_install;;
    "virtualenv")
      virt_env_install;;
    "pip")
