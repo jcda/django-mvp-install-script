@@ -62,8 +62,8 @@ fi
 # directory                                               #
 ###########################################################
 
-if [-d $WORK_DIRECTORY/$PROJECT_NAME]; then
-  mkdir -p $WORK_DIRECTORY/$PROJECT_NAME
+if [ -d "$WORK_DIRECTORY/$PROJECT_NAME" ]; then
+  mkdir -p "$WORK_DIRECTORY/$PROJECT_NAME"
 fi
 
 ###########################################################
@@ -71,7 +71,7 @@ fi
 ###########################################################
 
 os_package_install(){
-exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev
+exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev
 
 ###########################################################
 # basic setup of fail2ban to be added here                #
@@ -301,7 +301,7 @@ ENVIRONMENT
 #    mkdir WORK_DIRECTORY
 #fi
 
-echo "command " $1 "will be processed"
+#echo "command " $1 "will be processed"
 case $1 in
   "")
      display_help;;
