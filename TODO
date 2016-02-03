@@ -13,3 +13,5 @@ Convert it to python
 - add an index.html file with a list of useful urls mentioned in the presentation
 
 - setup of fail2ban details
+
+- add a postgresql setup for production deployment
