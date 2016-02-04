@@ -15,3 +15,9 @@ Convert it to python
 - setup of fail2ban details
 
 - add a postgresql setup for production deployment
+        [] adding the option in the menu and documentation
+        [] install of postgresql
+        [] changing the configuration in setup.py
+
+someday: maybe
+- add a cookiecutter option with Pydanny's cookiecutter

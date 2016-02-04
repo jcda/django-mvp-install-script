@@ -71,7 +71,7 @@ fi
 ###########################################################
 
 os_package_install(){
-exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev
+exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3
 
 ###########################################################
 # basic setup of fail2ban to be added here                #
@@ -265,6 +265,39 @@ echo "nginx setup done"
 }
 
 ###########################################################
+# Install and configuration of Postgresql for production
+###########################################################
+
+install_postgresql(){
+
+#
+# Installation of the packages
+#
+# sudo apt-get install postgresql
+
+#
+# creation of the database
+#
+
+# using https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-django-with-postgres-nginx-and-gunicorn
+# for reference
+# sudo su - postgres
+# createdb mydb
+# createuser -P
+## 6 questions prompted here
+# psql
+# GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
+#
+
+#
+# configuration the setup.py to point towards the local DATABASE
+#
+
+
+echo "temporary dummy"
+echo "Postgresql installation and setup done"
+}
+###########################################################
 # Help page                                               #
 ###########################################################
 display_help(){
@@ -276,16 +309,31 @@ SYNOPSIS
     django-mvp-install.sh [OPTION]
 DESCRIPTION
     all : install the whole shebang following the path defined in the script
-    os
-    virtualenv
-    pip
-    django
-    edge
-    nginx
-    uwsgi
+    for development purpose, the database used is sqlite in thie s case,
+    but can be transfered to postgresql later on
+    all-production : installs the whole shebang usiting postgresql as database
+    os : install all the components required from the OS side
+    virtualenv : create a chrooted environment for the python project
+     that doesnt impact on the rest of the server configuration
+    pip : installs a separated pip for the virtual ENVIRONMENT
+    django : install django in the separated virtual environment previously
+    created
+    edge : installs the django template edge
+    nginx : setups the nginx http server
+    uwsgi : setups uwsgi to work with nginx
 
 ENVIRONMENT
+    on the first run of this script, a .mvprc file is created in the
+    home directory of the user it contains the default variables used
+    by the script this will work out of the box with the default variables, but
+    you should personalize them.
 
+   WORK_DIRECTORY   default: $HOME/demo
+   PROJECT_NAME     default: YourProject
+   EDGE_URL         default: https://github.com/arocks/edge/archive/master.zip
+   PYPI_URL         default: https://pypi.python.org/packages/source/s/setuptools/setuptools-1.1.6.tar.gz
+   INSTALL_CMD      default: \"sudo apt-get install\"
+   ADMIN_EMAIL      default:\"root@localhost.localdomain\"
 "
 
 }
@@ -313,6 +361,14 @@ case $1 in
      #uwsgi_install_setup;
      #nginx_install;
   "all")
+     os_package_install;
+     virt_env_install;
+     pip_install;
+     django_install;
+     django_edge_install;
+     uwsgi_install_setup;
+     nginx_install;;
+   "all-prod")
      os_package_install;
      virt_env_install;
      pip_install;
