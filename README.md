@@ -8,7 +8,7 @@ then I added also a bookmark html file with important links to visit.
 # Pre requisites
 
 ## Bash
-Bash ( Bourne Again Shell )is a command line interface 
+Bash ( Bourne Again Shell )is a command line interface
 http://www.tldp.org
 http://tldp.org/guides.html
 http://tldp.org/LDP/Bash-Beginners-Guide/html/index.html
@@ -36,6 +36,9 @@ run "vimtutor es"  to go through a 20 minutes training on the computer where you
 emacs
 gnu.org/software/emacs/
 
+## a database
+ for basic test and development use: sqlite3
+ for more advanced work: Postgresql
 
 ## for MS Windows
 cygwin
@@ -100,4 +103,4 @@ http://celery.readthedocs.org/en/latest/django/first-steps-with-django.html
 ## IDE
 
 pycharm
-
+atom.io

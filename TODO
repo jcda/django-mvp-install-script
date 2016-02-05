@@ -1,5 +1,4 @@
 list of features to add to the django-mvp-install.sh script
-Convert it to python
 
 - sanity check
           - is it a *nix or *nux machine
@@ -8,9 +7,6 @@ Convert it to python
 - setup of logwatch
           - add nginx logwatch : number connections from different IPs in the last 24 hours
           - add a query on the database used by django to count the number of new users in the last 24 hours
-
-
-- add an index.html file with a list of useful urls mentioned in the presentation
 
 - setup of fail2ban details
 
@@ -21,3 +17,4 @@ Convert it to python
 
 someday: maybe
 - add a cookiecutter option with Pydanny's cookiecutter
+- Convert it to python

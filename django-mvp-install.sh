@@ -71,7 +71,7 @@ fi
 ###########################################################
 
 os_package_install(){
-exec $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3
+ `$INSTALL_CMD` tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3
 
 ###########################################################
 # basic setup of fail2ban to be added here                #
@@ -218,7 +218,9 @@ echo "now you need to create a superuser account "
 nginx_install(){
 
 #exec $INSTALL_CMD nginx
-
+if [ -d "/etc/nginx/sites-available"]; then
+  sudo sh -c "mkdir -p /etc/nginx/sites-available"
+fi
 sudo sh -c "echo '
 server {
     listen          80;
@@ -361,12 +363,12 @@ case $1 in
      #uwsgi_install_setup;
      #nginx_install;
   "all")
-     os_package_install;
-     virt_env_install;
-     pip_install;
-     django_install;
-     django_edge_install;
-     uwsgi_install_setup;
+     os_package_install &&
+     virt_env_install &&
+     pip_install &&
+     django_install &&
+     django_edge_install &&
+     uwsgi_install_setup &&
      nginx_install;;
    "all-prod")
      os_package_install;
