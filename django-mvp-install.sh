@@ -91,7 +91,8 @@ echo "Package install Done"
 
 virt_env_install(){
 cd $WORK_DIRECTORY
-/usr/bin/pyvenv-3.4 $PROJECT_NAME --without-pip
+#/usr/bin/pyvenv-3.4 $PROJECT_NAME --without-pip
+pyvenv-3.4 $PROJECT_NAME --without-pip
 cd $PROJECT_NAME
 source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
 
