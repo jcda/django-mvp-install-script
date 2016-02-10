@@ -58,11 +58,11 @@ echo "
 export WORK_DIRECTORY=$HOME/demo
 export PROJECT_NAME=YourProject
 export EDGE_URL=https://github.com/arocks/edge/archive/master.zip
-export PYPI_URL=https://pypi.python.org/packages/source/s/setuptools/setuptools-1.1.6.tar.gz
+export PYPI_URL=https://bootstrap.pypa.io/ez_setup.py
 export INSTALL_CMD=\"sudo apt-get install\"
 export ADMIN_EMAIL=\"root@localhost.localdomain\"
 ">> ~/.mvprc ;
- exit
+exit
 fi
 
 ###########################################################
@@ -89,13 +89,16 @@ echo "Package install Done"
 ###########################################################
 
 virt_env_install(){
+
 cd $WORK_DIRECTORY
 #/usr/bin/pyvenv-3.4 $PROJECT_NAME --without-pip
 pyvenv-3.4 $PROJECT_NAME --without-pip
 cd $PROJECT_NAME
-source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+echo "source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate"> \
+$WORK_DIRECTORY/$PROJECT_NAME/.env
 
 echo "Python virtual environment installed"
+echo "virtualenv `date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
 }
 
 ###########################################################
@@ -104,15 +107,20 @@ echo "Python virtual environment installed"
 
 pip_install(){
 
-source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-cd $WORK_DIRECTORY/$PROJECT_NAME
-#curl -O $PYPI_URL
-#tar -xzf setuptools-1.1.6.tar.gz
-#bin/python setuptools-1.1.6/ez_setup.py
-curl https://bootstrap.pypa.io/ez_setup.py -o - | python
-easy_install pip
 
-echo "Pip installation done"
+if grep -q virtualtenv $WORK_DIRECTORY/$PROJECT_NAME/.log; then
+    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+    cd $WORK_DIRECTORY/$PROJECT_NAME
+    #curl -O $PYPI_URL
+    #tar -xzf setuptools-1.1.6.tar.gz
+    #bin/python setuptools-1.1.6/ez_setup.py
+    curl $PYPI_URL -o - | python&& easy_install pip
+    echo "Pip installation done"
+    echo "pip :`date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
+else
+    echo "Well, this is disapointing, but virtualenv should be installed before "
+    exit
+fi
 }
 
 ###########################################################
@@ -121,10 +129,16 @@ echo "Pip installation done"
 
 django_install(){
 
-source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-pip install Django
+if grep -q pip $WORK_DIRECTORY/$PROJECT_NAME/.log; then
+    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+    pip install Django
 
-echo "Django framework installed"
+    echo "Django framework installed"
+    echo "django `date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
+else
+    echo "Well, this is disapointing, but pip should be installed before"
+    exit
+fi
 }
 
 ###########################################################
@@ -174,40 +188,47 @@ echo "uwsgi an nginx services installed"
 # 4: installation of django then the edge framework       #
 ###########################################################
 
-django_edge_install(){
-source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-cd $WORK_DIRECTORY/$PROJECT_NAME
-django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
+django_edge_dev_install(){
+if grep -q django $WORK_DIRECTORY/$PROJECT/.log; then
+
+   source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+   cd $WORK_DIRECTORY/$PROJECT_NAME
+   django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
 
 ###########################################################
 #         installation of the packages                    #
 ###########################################################
 
-cd $PROJECT_NAME
-pip install -r requirements.txt
+   cd $PROJECT_NAME
+   pip install -r requirements.txt
 
 ##########################################################
 #        installation of the local.env specific to this  #
 #    server                                              #
 ##########################################################
 
-echo " installation of the local.env file in settings"
-cp $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/local.sample.env $WORK_DIRECTORY/$WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/local.env
+   echo " installation of the local.env file in settings"
+   cp $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/local.sample.env $WORK_DIRECTORY/$WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/local.env
 
 ###########################################################
 #         migration of the sqlite database                #
 ###########################################################
 
-cd src
-python manage.py migrate
+    cd src
+    python manage.py migrate
 
 ###########################################################
 #         creation of a superuser account                 #
 ###########################################################
 
 
-echo "django edge installed"
-echo "now you need to create a superuser account "
+    echo "django edge installed"
+    echo "now you need to create a superuser account "
+    echo " edge_dev `date`">> $WORK_DIRECTORY/$PROJECT_NAME/.log
+else
+   echo " Well, this is disappointing, but django wasnt installed beforehand "
+  exit
+fi
 }
 
 
@@ -310,19 +331,23 @@ turn-key framework automagically
 SYNOPSIS
     django-mvp-install.sh [OPTION]
 DESCRIPTION
-    all : install the whole shebang following the path defined in the script
+    This tool is to automate the installation process of a basic django website
+    the options are the following :
+    - base: installs a virtual environment with the base of python 3, pip separated
+    from the OS, and django.
+    - all : install the whole shebang following the path defined in the script
     for development purpose, the database used is sqlite in thie s case,
     but can be transfered to postgresql later on
     all-production : installs the whole shebang usiting postgresql as database
-    os : install all the components required from the OS side
-    virtualenv : create a chrooted environment for the python project
+    - os : install all the components required from the OS side
+    - virtualenv : create a chrooted environment for the python project
      that doesnt impact on the rest of the server configuration
-    pip : installs a separated pip for the virtual ENVIRONMENT
-    django : install django in the separated virtual environment previously
+    - pip : installs a separated pip for the virtual ENVIRONMENT
+    - django : install django in the separated virtual environment previously
     created
-    edge : installs the django template edge
-    nginx : setups the nginx http server
-    uwsgi : setups uwsgi to work with nginx
+    - edge : installs the django template edge
+    - nginx : setups the nginx http server
+    - uwsgi : setups uwsgi to work with nginx
 
 ENVIRONMENT
     on the first run of this script, a .mvprc file is created in the
@@ -362,12 +387,16 @@ case $1 in
      #django_edge_install;
      #uwsgi_install_setup;
      #nginx_install;
+  "base")
+     virt_env_install;
+     pip_install;
+     django_install;;
   "all")
      os_package_install &&
      virt_env_install &&
      pip_install &&
      django_install &&
-     django_edge_install &&
+     django_edge_dev_install &&
      uwsgi_install_setup &&
      nginx_install;;
    "all-prod")
@@ -375,7 +404,7 @@ case $1 in
      virt_env_install;
      pip_install;
      django_install;
-     django_edge_install;
+     django_edge_dev_install;
      uwsgi_install_setup;
      nginx_install;;
    "os")
@@ -387,7 +416,7 @@ case $1 in
    "django")
      django_install;;
    "edge")
-     django_edge_install;;
+     django_edge_dev_install;;
    "uwsgi")
      uwsgi_install_setup;;
    "nginx")

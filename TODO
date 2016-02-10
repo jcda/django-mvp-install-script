@@ -1,5 +1,7 @@
 list of features to add to the django-mvp-install.sh script
 
+- autoenv for python
+  add a .env file at the root directory of the virtual environment to call a "source bin/activate"
 - sanity check
           - is it a *nix or *nux machine
           - is there enough space on the computer ?
