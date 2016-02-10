@@ -49,7 +49,7 @@ source ~/.mvprc
       mkdir -p "$WORK_DIRECTORY"
     fi
     if [ -d "$WORK_DIRECTORY/$PROJECT_NAME" ]; then
-      mkdir -p "$WORK_DIRECTORY/$PROJECT_NAME"]
+      mkdir -p "$WORK_DIRECTORY/$PROJECT_NAME"
     fi
 else
 echo "No .mvprc file in your home directory, one will be created with the default values";
