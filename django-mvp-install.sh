@@ -38,11 +38,19 @@
 ###########################################################
 
 ###########################################################
-# 1: Declaration of the environment variables             #
+# 1: Sanity Check and Directory creation                  # 
+# i  Declaration of the environment variables             #
 ###########################################################
 
 if [ -f ~/.mvprc ]; then
 source ~/.mvprc
+
+    if [ -d "$WORK_DIRECTORY" ]; then
+      mkdir -p "$WORK_DIRECTORY"
+    fi
+    if [ -d "$WORK_DIRECTORY/$PROJECT_NAME" ]; then
+      mkdir -p "$WORK_DIRECTORY/$PROJECT_NAME"]
+    fi
 else
 echo "No .mvprc file in your home directory, one will be created with the default values";
 echo " Feel free to modify the data. ";
@@ -55,15 +63,6 @@ export INSTALL_CMD=\"sudo apt-get install\"
 export ADMIN_EMAIL=\"root@localhost.localdomain\"
 ">> ~/.mvprc ;
  exit
-fi
-
-###########################################################
-# 1.a: basic sanity check for work directory and project  #
-# directory                                               #
-###########################################################
-
-if [ -d "$WORK_DIRECTORY/$PROJECT_NAME" ]; then
-  mkdir -p "$WORK_DIRECTORY/$PROJECT_NAME"
 fi
 
 ###########################################################
