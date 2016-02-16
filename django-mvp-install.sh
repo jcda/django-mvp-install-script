@@ -356,6 +356,8 @@ DESCRIPTION
     be already installed
     - nginx : setups the nginx http server. ROOT PRIVILEGES ARE REQUIRED.
     - uwsgi : setups uwsgi to work with nginx. ROOT PRIVILEGES ARE REQUIRED
+    - runserver : will run locally a test webserver for your tests on the port 8000
+    - superuser : invokes the command to create a superuser account
 
 ENVIRONMENT
     on the first run of this script, a .mvprc file is created in the
@@ -373,6 +375,28 @@ ENVIRONMENT
 
 }
 
+###########################################################
+# run the test server on the port 8000                    #
+###########################################################
+
+run_test_server(){
+
+source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
+./manage.py runserver
+
+}
+###########################################################
+# run the command to create a superuser                   #
+###########################################################
+
+create_superuser(){
+
+source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
+./manage.py createsuperuser
+
+}
 
 ###########################################################
 # Main execution                                          #
@@ -430,6 +454,12 @@ case $1 in
      uwsgi_install_setup;;
    "nginx")
      nginx_install;;
+    "runserver")
+      run_test_server;;
+    "superuser")
+      create_superuser;;
    "nuke")
      echo "you don't want to do that ... not yet";;
+     "*")
+      display_help;;
 esac
