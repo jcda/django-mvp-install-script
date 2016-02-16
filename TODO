@@ -11,6 +11,8 @@ list of features to add to the django-mvp-install.sh script
 
 - setup of fail2ban details
 
+- make the installation less verbose: redirect components installation to the logfile
+
 - add a postgresql setup for production deployment
         [] adding the option in the menu and documentation
         [] install of postgresql
@@ -19,9 +21,8 @@ list of features to add to the django-mvp-install.sh script
 - add ssl configuration for the nginx server
 
 modify Edge's template.
-	[] create a local Edge with python-social-auth or django-allauth 
+	[] create a local Edge with python-social-auth or django-allauth
 	[] move to a newer boostrap version
 
 someday: maybe
 - Convert it to python maybe a wxpython interface ?
-

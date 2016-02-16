@@ -195,6 +195,8 @@ if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
    cd $WORK_DIRECTORY/$PROJECT_NAME
    django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
 
+   chmod +x $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/manage.py
+
 ###########################################################
 #         installation of the packages                    #
 ###########################################################
@@ -208,14 +210,17 @@ if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 ##########################################################
 
    echo " installation of the local.env file in settings"
-   cp $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/local.sample.env $WORK_DIRECTORY/$WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/local.env
+   cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/
+   cat local.sample.env | sed '/SECRET_KEY/d' > local.env
+   MAGIC_KEY=`python -c 'import random; import string; print("".join([random.SystemRandom().choice(string.digits + string.ascii_letters + string.punctuation) for i in range(100)]))'`
+   echo "SECRET_KEY="$MAGIC_KEY >> local.env
 
 ###########################################################
 #         migration of the sqlite database                #
 ###########################################################
 
-    cd src
-    python manage.py migrate
+    cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
+    ./manage.py migrate
 
 ###########################################################
 #         creation of a superuser account                 #
