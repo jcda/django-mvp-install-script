@@ -38,7 +38,7 @@
 ###########################################################
 
 ###########################################################
-# 1: Sanity Check and Directory creation                  # 
+# 1: Sanity Check and Directory creation                  #
 # i  Declaration of the environment variables             #
 ###########################################################
 
@@ -96,6 +96,7 @@ pyvenv-3.4 $PROJECT_NAME --without-pip
 cd $PROJECT_NAME
 echo "source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate"> \
 $WORK_DIRECTORY/$PROJECT_NAME/.env
+chmod +x $WORK_DIRECTORY/$PROJECT_NAME/.env
 
 echo "Python virtual environment installed"
 echo "virtualenv `date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
@@ -108,7 +109,7 @@ echo "virtualenv `date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
 pip_install(){
 
 
-if grep -q virtualtenv $WORK_DIRECTORY/$PROJECT_NAME/.log; then
+if grep -q virtualenv $WORK_DIRECTORY/$PROJECT_NAME/.log; then
     source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
     cd $WORK_DIRECTORY/$PROJECT_NAME
     #curl -O $PYPI_URL
@@ -189,7 +190,7 @@ echo "uwsgi an nginx services installed"
 ###########################################################
 
 django_edge_dev_install(){
-if grep -q django $WORK_DIRECTORY/$PROJECT/.log; then
+if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
    cd $WORK_DIRECTORY/$PROJECT_NAME
@@ -390,7 +391,8 @@ case $1 in
   "base")
      virt_env_install;
      pip_install;
-     django_install;;
+     django_install;
+     django_edge_dev_install;;
   "all")
      os_package_install &&
      virt_env_install &&
