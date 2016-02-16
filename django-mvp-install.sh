@@ -45,18 +45,19 @@
 if [ -f ~/.mvprc ]; then
 source ~/.mvprc
 
-    if [ -d "$WORK_DIRECTORY" ]; then
+    if [ ! -d "$WORK_DIRECTORY" ]; then
+      echo "creating the $WORK_DIRECTORY directory"
       mkdir -p "$WORK_DIRECTORY"
     fi
-    if [ -d "$WORK_DIRECTORY/$PROJECT_NAME" ]; then
+    if [ ! -d "$WORK_DIRECTORY/$PROJECT_NAME" ]; then
       mkdir -p "$WORK_DIRECTORY/$PROJECT_NAME"
     fi
 else
 echo "No .mvprc file in your home directory, one will be created with the default values";
 echo " Feel free to modify the data. ";
 echo "
-export WORK_DIRECTORY=$HOME/demo
-export PROJECT_NAME=YourProject
+export WORK_DIRECTORY=$HOME/mvp-demo
+export PROJECT_NAME=mvp
 export EDGE_URL=https://github.com/arocks/edge/archive/master.zip
 export PYPI_URL=https://bootstrap.pypa.io/ez_setup.py
 export INSTALL_CMD=\"sudo apt-get install\"
@@ -70,7 +71,7 @@ fi
 ###########################################################
 
 os_package_install(){
- `$INSTALL_CMD` tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3
+  $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3
 
 ###########################################################
 # basic setup of fail2ban to be added here                #
@@ -112,10 +113,8 @@ pip_install(){
 if grep -q virtualenv $WORK_DIRECTORY/$PROJECT_NAME/.log; then
     source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
     cd $WORK_DIRECTORY/$PROJECT_NAME
-    #curl -O $PYPI_URL
-    #tar -xzf setuptools-1.1.6.tar.gz
-    #bin/python setuptools-1.1.6/ez_setup.py
-    curl $PYPI_URL -o - | python&& easy_install pip
+    curl $PYPI_URL -o - | python
+    easy_install pip
     echo "Pip installation done"
     echo "pip :`date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
 else
@@ -240,13 +239,13 @@ fi
 nginx_install(){
 
 #exec $INSTALL_CMD nginx
-if [ -d "/etc/nginx/sites-available"]; then
+if [ ! -d "/etc/nginx/sites-available" ]; then
   sudo sh -c "mkdir -p /etc/nginx/sites-available"
 fi
 sudo sh -c "echo '
 server {
     listen          80;
-    server_name     roo.red www.roo.red;
+    server_name     '$HOSTNAME' localhost.localdomain;
     access_log /var/log/nginx/access.log;
     error_log /var/log/error.log;
 
@@ -334,21 +333,24 @@ SYNOPSIS
 DESCRIPTION
     This tool is to automate the installation process of a basic django website
     the options are the following :
-    - base: installs a virtual environment with the base of python 3, pip separated
-    from the OS, and django.
+    - base: installs a virtual environment with the base of python 3, pip
+    separated from the OS, and django. Warning: OS dependances will have to be
+    installed first install Brew and Xcode on MacOSX platform or run this script
+    with os as parameter.
     - all : install the whole shebang following the path defined in the script
     for development purpose, the database used is sqlite in thie s case,
     but can be transfered to postgresql later on
-    all-production : installs the whole shebang usiting postgresql as database
-    - os : install all the components required from the OS side
+    - os : install all the components required from the OS side, picture
+    libraries for Pillow installation, and others. ROOT PRIVILEGES ARE REQUIRED
     - virtualenv : create a chrooted environment for the python project
      that doesnt impact on the rest of the server configuration
-    - pip : installs a separated pip for the virtual ENVIRONMENT
+    - pip : installs a separated pip for the virtual ENVIRONMENT.
     - django : install django in the separated virtual environment previously
-    created
-    - edge : installs the django template edge
-    - nginx : setups the nginx http server
-    - uwsgi : setups uwsgi to work with nginx
+    created. It requires pip to be installed
+    - edge : installs the django template edge. It requires django and pip to
+    be already installed
+    - nginx : setups the nginx http server. ROOT PRIVILEGES ARE REQUIRED.
+    - uwsgi : setups uwsgi to work with nginx. ROOT PRIVILEGES ARE REQUIRED
 
 ENVIRONMENT
     on the first run of this script, a .mvprc file is created in the

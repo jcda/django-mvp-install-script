@@ -1,7 +1,6 @@
 list of features to add to the django-mvp-install.sh script
 
-- autoenv for python
-  add a .env file at the root directory of the virtual environment to call a "source bin/activate"
+- add a prompt environment variable for sourcing the .env of the project
 - sanity check
           - is it a *nix or *nux machine
           - is there enough space on the computer ?
@@ -17,6 +16,12 @@ list of features to add to the django-mvp-install.sh script
         [] install of postgresql
         [] changing the configuration in setup.py
 
+- add ssl configuration for the nginx server
+
+modify Edge's template.
+	[] create a local Edge with python-social-auth or django-allauth 
+	[] move to a newer boostrap version
+
 someday: maybe
-- add a cookiecutter option with Pydanny's cookiecutter
-- Convert it to python
+- Convert it to python maybe a wxpython interface ?
+
