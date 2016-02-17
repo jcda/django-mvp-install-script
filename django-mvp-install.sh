@@ -460,6 +460,6 @@ case $1 in
       create_superuser;;
    "nuke")
      echo "you don't want to do that ... not yet";;
-     "*")
+     *)
       display_help;;
 esac
