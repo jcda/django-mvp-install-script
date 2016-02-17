@@ -72,17 +72,20 @@ fi
 
 os_package_install(){
   $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3
+  echo "package install done"
 
 ###########################################################
 # basic setup of fail2ban to be added here                #
 ###########################################################
 
+echo "fail2ban setup not implemented yet"
+
 ###########################################################
 # adding your address to the forwarded users for reports  #
 ###########################################################
 
+echo " adding admin user to emails not implemented yet"
 
-echo "Package install Done"
 }
 
 ###########################################################
@@ -338,11 +341,11 @@ SYNOPSIS
 DESCRIPTION
     This tool is to automate the installation process of a basic django website
     the options are the following :
-    - base: installs a virtual environment with the base of python 3, pip
+    - base: [meta] installs a virtual environment with the base of python 3, pip
     separated from the OS, and django. Warning: OS dependances will have to be
     installed first install Brew and Xcode on MacOSX platform or run this script
     with os as parameter.
-    - all : install the whole shebang following the path defined in the script
+    - all : [meta] install the whole shebang following the path defined in the script
     for development purpose, the database used is sqlite in thie s case,
     but can be transfered to postgresql later on
     - os : install all the components required from the OS side, picture
@@ -354,8 +357,8 @@ DESCRIPTION
     created. It requires pip to be installed
     - edge : installs the django template edge. It requires django and pip to
     be already installed
-    - nginx : setups the nginx http server. ROOT PRIVILEGES ARE REQUIRED.
-    - uwsgi : setups uwsgi to work with nginx. ROOT PRIVILEGES ARE REQUIRED
+    - nginx : [under construction ] setups the nginx http server. ROOT PRIVILEGES ARE REQUIRED.
+    - uwsgi : [under construction ]setups uwsgi to work with nginx. ROOT PRIVILEGES ARE REQUIRED
     - runserver : will run locally a test webserver for your tests on the port 8000
     - superuser : invokes the command to create a superuser account
 
@@ -420,9 +423,9 @@ case $1 in
      #uwsgi_install_setup;
      #nginx_install;
   "base")
-     virt_env_install;
-     pip_install;
-     django_install;
+     virt_env_install &&
+     pip_install &&
+     django_install &&
      django_edge_dev_install;;
   "all")
      os_package_install &&
