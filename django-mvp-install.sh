@@ -27,15 +27,25 @@
 # please do not hesitate to create tickets on             #
 # https://github.com/jcda/mvp-notes/issues                #
 #                                                         #
-# usage : django-mvp-install.sh [dev,proj]                #
+# usage : django-mvp-install.sh [option]                  #
 # no option will give a full installation with the steps  #
 # 2,3,4,5 executed                                        #
-# dev will execute the setps 3 and 4                      #
+# dev will execute the steps 3 and 4                      #
 # proj will execute the step 4 only                       #
 #                                                         #
 # some part of this project are interactive               #
 # as you are asked for passwords                          #
 ###########################################################
+
+###########################################################
+# short cut for activation of virtualenv                  #
+###########################################################
+
+activate(){
+    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+    cd $WORK_DIRECTORY/$PROJECT_NAME
+}
+
 
 ###########################################################
 # 1: Sanity Check and Directory creation                  #
@@ -114,8 +124,9 @@ pip_install(){
 
 
 if grep -q virtualenv $WORK_DIRECTORY/$PROJECT_NAME/.log; then
-    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-    cd $WORK_DIRECTORY/$PROJECT_NAME
+    activate
+    #source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+    #cd $WORK_DIRECTORY/$PROJECT_NAME
     curl $PYPI_URL -o - | python
     easy_install pip
     echo "Pip installation done"
@@ -133,7 +144,8 @@ fi
 django_install(){
 
 if grep -q pip $WORK_DIRECTORY/$PROJECT_NAME/.log; then
-    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+    #source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+    activate
     pip install Django
 
     echo "Django framework installed"
@@ -149,7 +161,10 @@ fi
 ###########################################################
 
 uwsgi_install_setup(){
-source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+
+if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
+
+activate
 pip install uwsgi
 
 # add a script in /etc/init/ with the path to the wsgi
@@ -183,7 +198,11 @@ exec \$UWSGI --chdir='$WORK_DIRECTORY'/'$PROJECT_NAME'/'$PROJECT_NAME'/src/ --en
 # to start the whole framework without having to reboot
 sudo service uwsgi start && service nginx restart
 
+echo "uwsgi:`date`"> $WORK_DIRECTORY/$PROJECT_NAME/.log
+
 echo "uwsgi an nginx services installed"
+
+fi
 }
 
 
@@ -194,8 +213,9 @@ echo "uwsgi an nginx services installed"
 django_edge_dev_install(){
 if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
-   source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-   cd $WORK_DIRECTORY/$PROJECT_NAME
+   #source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+   #cd $WORK_DIRECTORY/$PROJECT_NAME
+   activate
    django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
 
    chmod +x $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/manage.py
@@ -231,7 +251,7 @@ if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
 
     echo "django edge installed"
-    echo "now you need to create a superuser account "
+    echo "now you need to create a superuser account, using the superuser option"
     echo " edge_dev `date`">> $WORK_DIRECTORY/$PROJECT_NAME/.log
 else
    echo " Well, this is disappointing, but django wasnt installed beforehand "
@@ -250,6 +270,7 @@ nginx_install(){
 if [ ! -d "/etc/nginx/sites-available" ]; then
   sudo sh -c "mkdir -p /etc/nginx/sites-available"
 fi
+if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 sudo sh -c "echo '
 server {
     listen          80;
@@ -291,9 +312,28 @@ sudo ln  /etc/nginx/sites-available/$PROJECT_NAME.conf /etc/nginx/sites-enabled/
 ###########################################################
 #    creation of the new conf file in the available confs #
 ###########################################################
-
+echo "nginx_uwsgi:`date`" $WORK_DIRECTORY/$PROJECT_NAME/.log
+fi
 echo "nginx setup done"
 }
+
+###########################################################
+#
+###########################################################
+
+gunicorn_nginx_setup(){
+
+    if grep -q uwsgi $WORK_DIRECTORY/$PROJECT_NAME/.log; then
+        echo "uwsgi already setup, this will conflict with the current setup"
+        exit
+    fi
+    if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
+
+
+
+}
+
+
 
 ###########################################################
 # Install and configuration of Postgresql for production
@@ -384,7 +424,8 @@ ENVIRONMENT
 
 run_test_server(){
 
-source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+activate
+#source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
 cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
 ./manage.py runserver
 
@@ -395,7 +436,8 @@ cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
 
 create_superuser(){
 
-source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+activate
+#source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
 cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
 ./manage.py createsuperuser
 
@@ -406,12 +448,6 @@ cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
 ###########################################################
 
 
-# test of directories
-#if [ -d $WORK_DIRECTORY ]
-#    mkdir WORK_DIRECTORY
-#fi
-
-#echo "command " $1 "will be processed"
 case $1 in
   "")
      display_help;;
