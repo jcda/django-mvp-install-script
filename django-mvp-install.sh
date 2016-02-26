@@ -37,14 +37,6 @@
 # as you are asked for passwords                          #
 ###########################################################
 
-###########################################################
-# short cut for activation of virtualenv                  #
-###########################################################
-
-activate(){
-    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-    cd $WORK_DIRECTORY/$PROJECT_NAME
-}
 
 
 ###########################################################
@@ -63,8 +55,8 @@ source ~/.mvprc
       mkdir -p "$WORK_DIRECTORY/$PROJECT_NAME"
     fi
 else
-echo "No .mvprc file in your home directory, one will be created with the default values";
-echo " Feel free to modify the data. ";
+echo "There's no .mvprc file in your home directory, one will be created with the default values";
+echo " Please modify the values. if this is not for test ";
 echo "
 export WORK_DIRECTORY=$HOME/mvp-demo
 export PROJECT_NAME=mvp
@@ -72,9 +64,29 @@ export EDGE_URL=https://github.com/arocks/edge/archive/master.zip
 export PYPI_URL=https://bootstrap.pypa.io/ez_setup.py
 export INSTALL_CMD=\"sudo apt-get install\"
 export ADMIN_EMAIL=\"root@localhost.localdomain\"
+export PGSQL_ADMIN_PASSWD=CHANGEME
+export PGSQL_ADMIN=pgsqldjangoadmin
+export PGSQL_DB_NAME=djangodb
+
 ">> ~/.mvprc ;
 exit
 fi
+
+###########################################################
+# short cut for activation of virtualenv                  #
+###########################################################
+
+activate(){
+    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+    cd $WORK_DIRECTORY/$PROJECT_NAME
+}
+###########################################################
+# function to simplify log entries                        #
+###########################################################
+log_event(){
+    echo "$1 :`date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
+}
+
 
 ###########################################################
 # 2: installation of the desired os packages              #
@@ -130,7 +142,7 @@ if grep -q virtualenv $WORK_DIRECTORY/$PROJECT_NAME/.log; then
     curl $PYPI_URL -o - | python
     easy_install pip
     echo "Pip installation done"
-    echo "pip :`date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
+    log_event "pip"
 else
     echo "Well, this is disapointing, but virtualenv should be installed before "
     exit
@@ -149,7 +161,7 @@ if grep -q pip $WORK_DIRECTORY/$PROJECT_NAME/.log; then
     pip install Django
 
     echo "Django framework installed"
-    echo "django `date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
+    log_event "django"
 else
     echo "Well, this is disapointing, but pip should be installed before"
     exit
@@ -198,7 +210,7 @@ exec \$UWSGI --chdir='$WORK_DIRECTORY'/'$PROJECT_NAME'/'$PROJECT_NAME'/src/ --en
 # to start the whole framework without having to reboot
 sudo service uwsgi start && service nginx restart
 
-echo "uwsgi:`date`"> $WORK_DIRECTORY/$PROJECT_NAME/.log
+log_event "uwsgi"
 
 echo "uwsgi an nginx services installed"
 
@@ -213,8 +225,6 @@ fi
 django_edge_dev_install(){
 if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
-   #source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-   #cd $WORK_DIRECTORY/$PROJECT_NAME
    activate
    django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
 
@@ -252,7 +262,7 @@ if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
     echo "django edge installed"
     echo "now you need to create a superuser account, using the superuser option"
-    echo " edge_dev `date`">> $WORK_DIRECTORY/$PROJECT_NAME/.log
+    log_event "edge_dev"
 else
    echo " Well, this is disappointing, but django wasnt installed beforehand "
   exit
@@ -312,7 +322,7 @@ sudo ln  /etc/nginx/sites-available/$PROJECT_NAME.conf /etc/nginx/sites-enabled/
 ###########################################################
 #    creation of the new conf file in the available confs #
 ###########################################################
-echo "nginx_uwsgi:`date`" $WORK_DIRECTORY/$PROJECT_NAME/.log
+log_event "nginx_uwsgi"
 fi
 echo "nginx setup done"
 }
@@ -329,8 +339,37 @@ gunicorn_nginx_setup(){
     fi
     if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
+      sudo sh -c "echo '
+      server {
+          listen          80;
+          server_name     '$HOSTNAME' localhost.localdomain;
+          access_log /var/log/nginx/access.log;
+          error_log /var/log/error.log;
 
+          location /static {
+              alias '$WORK_DIRECTORY'/'$PROJECT_NAME'/'$PROJECT_NAME'/src/static;
+          }
+          #error_page   404              /404.html;
+          #error_page   500 502 503 504  /50x.html;
+          #location = /50x.html {
+          #    root   /usr/share/nginx/html;
+          #}
+          location / {
+              uwsgi_pass 127.0.0.1:3031;
+              include         uwsgi_params;
+          }
 
+           location /itempics {
+               alias /var/www/'$PROJECT_NAME'/itempics;
+          }
+      }
+
+      '>/etc/nginx/sites-available/$PROJECT_NAME.conf"
+
+      #to activate this nginx configuration, this needs to be done
+      sudo ln  /etc/nginx/sites-available/$PROJECT_NAME.conf /etc/nginx/sites-enabled/$PROJECT_NAME.conf
+    fi
+log_event "gunicorn_nginx"
 }
 
 
@@ -341,33 +380,73 @@ gunicorn_nginx_setup(){
 
 install_postgresql(){
 
+# check if edge_dev is present in .logs
+if grep -q edge $WORK_DIRECTORY/$PROJECT_NAME/.log; then
+
 #
 # Installation of the packages
 #
-# sudo apt-get install postgresql
+sudo apt-get install postgresql postgresql-server-dev-all
+
+activate
+pip install psycopg2
 
 #
 # creation of the database
 #
 
 # using https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-django-with-postgres-nginx-and-gunicorn
-# for reference
-# sudo su - postgres
-# createdb mydb
-# createuser -P
-## 6 questions prompted here
-# psql
-# GRANT ALL PRIVILEGES ON DATABASE mydb TO myuser;
+
+#sudo -u postgres createdb --echo --owner=postgres mydb
+
+###########################################################
+# creation of the database admin
+###########################################################
+
+sudo -u postgres createuser -s -U $PGSQL_ADMIN
+echo "database admin added"
+sudo -u postgres psql -c "ALTER USER $PGSQL_ADMIN WITH PASSWORD '$PGSQL_ADMIN_PASSWD';"
+echo "database admin password created"
+
+###########################################################
+# creation of the database
+###########################################################
+
+sudo -u postgres createdb --owner=$PGSQL_ADMIN $PGSQL_DB_NAME
+echo "database creation done"
+
+###########################################################
+# change of the setup configuration for the project
+###########################################################
+#
+# we will modify $WORK_DIRECTORY/$PROJECT_NAME/src/$PROJECT_NAME/settings/local.env
+# in order to get DATABASE_URL=postgres://username:password@127.0.0.1:5432/database
 #
 
-#
 # configuration the setup.py to point towards the local DATABASE
+# Beware this is specific to the Edge setup
 #
+#
+cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/
+cp local.env local.env.orig
+cat local.env.orig|sed '/sqlite/d' > local.env
+echo "DATABASE_URL=postgres://$PGSQL_ADMIN:$PGSQL_ADMIN_PASSWD@127.0.0.1:5432/$PGSQL_DB_NAME" >> local.env
+echo "setup of django"
+cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
+./manage.py makemigrations
+./manage.py migrate
 
+log_event "postgresql"
 
-echo "temporary dummy"
 echo "Postgresql installation and setup done"
+
+else
+  echo "Edge wasnt previously installed, I am afraid I can't let you do that Dave"
+  exit
+fi
+
 }
+
 ###########################################################
 # Help page                                               #
 ###########################################################
@@ -414,6 +493,8 @@ ENVIRONMENT
    PYPI_URL         default: https://pypi.python.org/packages/source/s/setuptools/setuptools-1.1.6.tar.gz
    INSTALL_CMD      default: \"sudo apt-get install\"
    ADMIN_EMAIL      default:\"root@localhost.localdomain\"
+   PGSQL_ADMIN_PASSWD default:CHANGEME
+   PGSQL_ADMIN      default:pgsqldjangoadmin
 "
 
 }
@@ -425,7 +506,6 @@ ENVIRONMENT
 run_test_server(){
 
 activate
-#source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
 cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
 ./manage.py runserver
 
@@ -437,11 +517,36 @@ cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
 create_superuser(){
 
 activate
-#source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
 cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
 ./manage.py createsuperuser
+log_event "superuser"
 
 }
+
+###########################################################
+# nuke is deleting everything and restarting from scratch #
+###########################################################
+
+nuke(){
+
+echo "there is no return, I hope you did some backups if you change your mind"
+
+exit
+# remove the WORK_DIRECTORY
+
+# stop gunicorn
+
+# remove the nginx configuration
+
+# reload of nginx
+
+# remove the gunicorn configuration
+
+# removal of the database in pgsql
+
+}
+
+
 
 ###########################################################
 # Main execution                                          #
@@ -472,13 +577,12 @@ case $1 in
      uwsgi_install_setup &&
      nginx_install;;
    "all-prod")
-     os_package_install;
-     virt_env_install;
-     pip_install;
-     django_install;
-     django_edge_dev_install;
-     uwsgi_install_setup;
-     nginx_install;;
+     os_package_install &&
+     virt_env_install &&
+     pip_install &&
+     django_install &&
+     django_edge_dev_install &&
+     gunicorn_nginx_setup;;
    "os")
      os_package_install;;
    "virtualenv")
@@ -493,6 +597,10 @@ case $1 in
      uwsgi_install_setup;;
    "nginx")
      nginx_install;;
+    "postgresql")
+      install_postgresql;;
+    "gunicorn")
+      gunicorn_nginx_setup;;
     "runserver")
       run_test_server;;
     "superuser")
