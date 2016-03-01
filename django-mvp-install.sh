@@ -339,6 +339,23 @@ gunicorn_nginx_setup(){
     fi
     if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
+###########################################################
+# gunicorn setup
+# inside the project directory
+###########################################################
+
+echo "
+  command = \''$WORK_DIRECTORY'/'$PROJECT_NAME'/bin/gunicorn\'
+  pythonpath = ''$WORK_DIRECTORY'/$PROJECT_NAME'/'
+  bind = '127.0.0.1:8001'
+  workers = 3
+  user = nobody
+" >> $WORK_DIRECTORY/$PROJECT_NAME/gunicorn_config.py
+
+###########################################################
+# nginx setup
+###########################################################
+
       sudo sh -c "echo '
       server {
           listen          80;
