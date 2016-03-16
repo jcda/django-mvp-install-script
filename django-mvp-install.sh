@@ -38,10 +38,11 @@
 ###########################################################
 
 
-
+###########################################################
 ###########################################################
 # 1: Sanity Check and Directory creation                  #
 # i  Declaration of the environment variables             #
+###########################################################
 ###########################################################
 
 if [ -f ~/.mvprc ]; then
@@ -55,7 +56,8 @@ source ~/.mvprc
       mkdir -p "$WORK_DIRECTORY/$PROJECT_NAME"
     fi
 else
-echo "There's no .mvprc file in your home directory, one will be created with the default values";
+echo "There's no .mvprc file in your home directory,";
+echo " one will be created with the default values";
 echo " Please modify the values. if this is not for test ";
 echo "
 export WORK_DIRECTORY=$HOME/mvp-demo
@@ -89,7 +91,9 @@ log_event(){
 
 
 ###########################################################
+###########################################################
 # 2: installation of the desired os packages              #
+###########################################################
 ###########################################################
 
 os_package_install(){
@@ -111,7 +115,9 @@ echo " adding admin user to emails not implemented yet"
 }
 
 ###########################################################
+###########################################################
 # 3: installation of the python virtual environment       #
+###########################################################
 ###########################################################
 
 virt_env_install(){
@@ -129,7 +135,9 @@ echo "virtualenv `date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
 }
 
 ###########################################################
+###########################################################
 #    3.a. installation of pip                             #
+###########################################################
 ###########################################################
 
 pip_install(){
@@ -150,7 +158,9 @@ fi
 }
 
 ###########################################################
+###########################################################
 #    3.b. installation of django                          #
+###########################################################
 ###########################################################
 
 django_install(){
@@ -169,7 +179,9 @@ fi
 }
 
 ###########################################################
+###########################################################
 #    3.c. installation of uwsgi                           #
+###########################################################
 ###########################################################
 
 uwsgi_install_setup(){
@@ -200,7 +212,8 @@ env SOCKET=127.0.0.1:3031
 #env SOCKET=/tmp/uwsgi.sock
 #env chmod-socket = 664
 
-#the first attempt was from a website http://grokcode.com/784/how-to-setup-a-linux-nginx-uwsgi-python-django-server/
+#the first attempt was from a website
+#http://grokcode.com/784/how-to-setup-a-linux-nginx-uwsgi-python-django-server/
 
 exec \$UWSGI --chdir='$WORK_DIRECTORY'/'$PROJECT_NAME'/'$PROJECT_NAME'/src/ --env DJANGO_SETTINGS_MODULE='$PROJECT_NAME'.settings --master --socket=\$SOCKET --processes=5 --vacuum --virtualenv='$WORK_DIRECTORY'/'$PROJECT_NAME' --module '$PROJECT_NAME'.wsgi --logto \$LOGTO
 
@@ -219,7 +232,9 @@ fi
 
 
 ###########################################################
+###########################################################
 # 4: installation of django then the edge framework       #
+###########################################################
 ###########################################################
 
 django_edge_dev_install(){
@@ -269,9 +284,10 @@ else
 fi
 }
 
-
+###########################################################
 ###########################################################
 # 5: installation of nginx                                #
+###########################################################
 ###########################################################
 
 nginx_install(){
@@ -328,67 +344,90 @@ echo "nginx setup done"
 }
 
 ###########################################################
+###########################################################
+# Install and configuration of nginx and uwsgi for systemd
+###########################################################
+###########################################################
+uwsgi_systemd(){
+
+###########################################################
+# with the latest distributions moving to systemd, I had to
+# change the previous section and forget sysinit
 #
 ###########################################################
 
-gunicorn_nginx_setup(){
+###########################################################
+# first, uwsgi implementation with systemd
+###########################################################
 
-    if grep -q uwsgi $WORK_DIRECTORY/$PROJECT_NAME/.log; then
-        echo "uwsgi already setup, this will conflict with the current setup"
-        exit
+  if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
+
+
+  activate
+  pip install uwsgi
+
+  # add a script in / with the path to the wsgi
+  # file in the $PROJECT DIRECTORY
+  # first, uwsgi implementation with systemd
+  ###########################################################
+     if [ ! -d "/$WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/logs" ]; then
+
+      mkdir $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/logs
     fi
-    if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
-###########################################################
-# gunicorn setup
-# inside the project directory
-###########################################################
+echo "creating the conf file"
+  sudo sh -c "echo '
+[uwsgi]
+socket = 127.0.0.1:3031
+chdir = $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
+plugin = python3
+pythonpath = ../..
+env = DJANGO_SETTINGS_MODULE=$PROJECT_NAME.settings.production
+wsgi-file = $PROJECT_NAME/wsgi.py
+#module = mvp.wsgi:WSGIHandler()
+processes = 4
+threads = 2
+#stats = 127.0.0.1:9191
 
-echo "
-  command = \''$WORK_DIRECTORY'/'$PROJECT_NAME'/bin/gunicorn\'
-  pythonpath = ''$WORK_DIRECTORY'/$PROJECT_NAME'/'
-  bind = '127.0.0.1:8001'
-  workers = 3
-  user = nobody
-" >> $WORK_DIRECTORY/$PROJECT_NAME/gunicorn_config.py
 
-###########################################################
-# nginx setup
-###########################################################
 
-      sudo sh -c "echo '
-      server {
-          listen          80;
-          server_name     '$HOSTNAME' localhost.localdomain;
-          access_log /var/log/nginx/access.log;
-          error_log /var/log/error.log;
+  ' > /etc/uwsgi/apps-available/$PROJECT_NAME.ini"
 
-          location /static {
-              alias '$WORK_DIRECTORY'/'$PROJECT_NAME'/'$PROJECT_NAME'/src/static;
-          }
-          #error_page   404              /404.html;
-          #error_page   500 502 503 504  /50x.html;
-          #location = /50x.html {
-          #    root   /usr/share/nginx/html;
-          #}
-          location / {
-              uwsgi_pass 127.0.0.1:3031;
-              include         uwsgi_params;
-          }
+  echo "activation of the service"
+sudo ln /etc/uwsgi/apps-available/$PROJECT_NAME.ini /etc/uwsgi/apps-enabled/$PROJECT_NAME.ini
 
-           location /itempics {
-               alias /var/www/'$PROJECT_NAME'/itempics;
-          }
-      }
+ echo "changing the settings to allow connections of django "
+ echo "with 127.0.0.1 only "
+  # put 127.0.0.1 in the allowed hosts in the settings.
+  # to start the whole framework without having to reboot
+  sudo service uwsgi start && service nginx restart
 
-      '>/etc/nginx/sites-available/$PROJECT_NAME.conf"
+  log_event "uwsgi"
 
-      #to activate this nginx configuration, this needs to be done
-      sudo ln  /etc/nginx/sites-available/$PROJECT_NAME.conf /etc/nginx/sites-enabled/$PROJECT_NAME.conf
-    fi
-log_event "gunicorn_nginx"
+  echo "uwsgi an nginx services installed"
+
+  fi
+
+  #}
+
+
+  ###########################################################
+  # setup of a Firewall configuration letting the ports     #
+  # 80, 443, and 22 opened to the outside world             #
+  ###########################################################
+
+  ###########################################################
+  #    removal of the default server from active confs      #
+  ###########################################################
+
+  ###########################################################
+  #    creation of the new conf file in the available confs #
+  ###########################################################
+  log_event "uwsgi_systemd"
+  #fi
+  echo "uwsgi_systemd setup done"
+
 }
-
 
 
 ###########################################################
@@ -478,24 +517,29 @@ DESCRIPTION
     This tool is to automate the installation process of a basic django website
     the options are the following :
     - base: [meta] installs a virtual environment with the base of python 3, pip
-    separated from the OS, and django. Warning: OS dependances will have to be
-    installed first install Brew and Xcode on MacOSX platform or run this script
-    with os as parameter.
-    - all : [meta] install the whole shebang following the path defined in the script
-    for development purpose, the database used is sqlite in thie s case,
-    but can be transfered to postgresql later on
+      separated from the OS, and django. Warning: OS dependances will have to be
+      installed first install Brew and Xcode on MacOSX platform or run this
+      script with os as parameter.
+    - all : [meta] install the whole shebang following the path defined in the
+      script for development purpose, the database used is sqlite in thie s case,
+      but can be transfered to postgresql later on
+    - all-prod : [meta]
     - os : install all the components required from the OS side, picture
-    libraries for Pillow installation, and others. ROOT PRIVILEGES ARE REQUIRED
+      libraries for Pillow installation, and others.
+      ROOT PRIVILEGES ARE REQUIRED
     - virtualenv : create a chrooted environment for the python project
-     that doesnt impact on the rest of the server configuration
+      that doesnt impact on the rest of the server configuration
     - pip : installs a separated pip for the virtual ENVIRONMENT.
     - django : install django in the separated virtual environment previously
-    created. It requires pip to be installed
+      created. It requires pip to be installed
     - edge : installs the django template edge. It requires django and pip to
-    be already installed
-    - nginx : [under construction ] setups the nginx http server. ROOT PRIVILEGES ARE REQUIRED.
-    - uwsgi : [under construction ]setups uwsgi to work with nginx. ROOT PRIVILEGES ARE REQUIRED
-    - runserver : will run locally a test webserver for your tests on the port 8000
+      be already installed
+    - nginx : [under construction ] setups the nginx http server.
+      ROOT PRIVILEGES ARE REQUIRED.
+    - uwsgi : [under construction ]setups uwsgi to work with nginx.
+      ROOT PRIVILEGES ARE REQUIRED
+    - runserver : will run locally a test webserver for your tests on the
+      port 8000
     - superuser : invokes the command to create a superuser account
 
 ENVIRONMENT
@@ -573,13 +617,16 @@ exit
 case $1 in
   "")
      display_help;;
+     # all the available options are here:
      #os_package_install;
      #virt_env_install;
      #pip_install;
      #django_install;
      #django_edge_install;
-     #uwsgi_install_setup;
+     #uwsgi_install_setup; #(exclusive with uwsgi_systemd)
+     #uwsgi_systemd; #(exclusive with uwsgi_install_setup)
      #nginx_install;
+
   "base")
      virt_env_install &&
      pip_install &&
@@ -591,15 +638,20 @@ case $1 in
      pip_install &&
      django_install &&
      django_edge_dev_install &&
+     install_postgresql &&
      uwsgi_install_setup &&
      nginx_install;;
+
    "all-prod")
      os_package_install &&
      virt_env_install &&
      pip_install &&
      django_install &&
      django_edge_dev_install &&
-     gunicorn_nginx_setup;;
+     install_postgresql &&
+     uwsgi_systemd &&
+     nginx_install ;;
+
    "os")
      os_package_install;;
    "virtualenv")
@@ -612,6 +664,8 @@ case $1 in
      django_edge_dev_install;;
    "uwsgi")
      uwsgi_install_setup;;
+     "uwsgi_systemd")
+     uwsgi_systemd;;
    "nginx")
      nginx_install;;
     "postgresql")

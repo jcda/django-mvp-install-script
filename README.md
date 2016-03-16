@@ -1,4 +1,7 @@
 
+This project went from a simple presentation to a universal installer
+http://imgs.xkcd.com/comics/universal_install_script.png
+
 # mvp-notes
 #Introduction
 This repository contains Notes and links from an  mvp presentation for Barcelona's Big Data Startups.
