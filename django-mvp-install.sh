@@ -97,7 +97,7 @@ log_event(){
 ###########################################################
 
 os_package_install(){
-  $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3
+  $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3-venv libjpeg-dev zlib1g-dev sqlite3 gcc
   echo "package install done"
 
 ###########################################################
@@ -124,7 +124,7 @@ virt_env_install(){
 
 cd $WORK_DIRECTORY
 #/usr/bin/pyvenv-3.4 $PROJECT_NAME --without-pip
-pyvenv-3.4 $PROJECT_NAME --without-pip
+pyvenv $PROJECT_NAME --without-pip
 cd $PROJECT_NAME
 echo "source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate"> \
 $WORK_DIRECTORY/$PROJECT_NAME/.env
