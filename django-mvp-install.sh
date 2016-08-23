@@ -59,6 +59,8 @@ echo "
 export WORK_DIRECTORY=$HOME/mvp-demo
 export PROJECT_NAME=mvp
 export EDGE_URL=https://github.com/arocks/edge/archive/master.zip
+export CMS1L_URL=https://github.com/jcda/djangocms-onepage-template/archive/master.zip
+export CMS_URL=https://github.com/jcda/djangocms-template/archive/master.zip
 export PYPI_URL=https://bootstrap.pypa.io/ez_setup.py
 export INSTALL_CMD=\"sudo apt-get install\"
 export ADMIN_EMAIL=\"root@localhost.localdomain\"
@@ -134,7 +136,13 @@ django_install(){
 
 if grep -q pip $WORK_DIRECTORY/$PROJECT_NAME/.log; then
     source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-    pip install Django
+    if [$# -ne 1]
+       pip install Django
+    else
+       echo $1 is the number of the django version to be installed
+       pip install django==$1
+
+    fi
 
     echo "Django framework installed"
     echo "django `date`" >> $WORK_DIRECTORY/$PROJECT_NAME/.log
