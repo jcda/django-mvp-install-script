@@ -59,7 +59,7 @@ echo "
 export WORK_DIRECTORY=$HOME/mvp-demo
 export PROJECT_NAME=mvp
 export EDGE_URL=https://github.com/arocks/edge/archive/master.zip
-export CMS1L_URL=https://github.com/jcda/djangocms-onepage-template/archive/master.zip
+export CMS1P_URL=https://github.com/jcda/djangocms-onepage-template/archive/master.zip
 export CMS_URL=https://github.com/jcda/djangocms-template/archive/master.zip
 export PYPI_URL=https://bootstrap.pypa.io/ez_setup.py
 export INSTALL_CMD=\"sudo apt-get install\"
@@ -547,6 +547,10 @@ case $1 in
      django_install;;
    "edge")
      django_edge_dev_install;;
+   "cms")
+     django_template_install $CMS_URL;;
+   "cms1p")
+     django_template_install $CMS1P_URL;;
    "uwsgi")
      uwsgi_install_setup;;
    "nginx")
