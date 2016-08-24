@@ -25,7 +25,7 @@ install_postgresql
 display_help
 run_test_server
 create_superuser
-nuke project
+nuke_project
 
 
 main parameters:

@@ -350,10 +350,21 @@ server {
 
 #to activate this nginx configuration, this needs to be done
 sudo ln  /etc/nginx/sites-available/$PROJECT_NAME.conf /etc/nginx/sites-enabled/$PROJECT_NAME.conf
+
 ###########################################################
 # setup of a Firewall configuration letting the ports     #
 # 80, 443, and 22 opened to the outside world             #
 ###########################################################
+
+sudo iptables -A INPUT -i lo -j ACCEPT
+sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 8000 -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+sudo iptables -A INPUT -j DROP
+
+sudo iptables-save
 
 ###########################################################
 #    removal of the default server from active confs      #
@@ -406,7 +417,8 @@ echo "Postgresql installation and setup done"
 ##########################################################
 nuke_project(){
 echo "this is too late to go back now"
-
+rm -rf $WORK_DIRECTORY/$PROJECT_NAME
+echo "removal of nginx, the database and uwsgi not implemented yet"
 }
 
 
@@ -544,7 +556,7 @@ case $1 in
     "superuser")
       create_superuser;;
    "nuke")
-     echo "you don't want to do that ... not yet";;
+      nuke_project;;
      *)
       display_help;;
 esac
