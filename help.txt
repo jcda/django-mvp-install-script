@@ -1,0 +1,28 @@
+available variables:
+
+WORK_DIRECTORY
+PROJECT_NAME
+EDGE_URL
+CMS1L_URL
+CMS_URL
+PYPI_URL
+INSTALL_CMD
+ADMIN_EMAIL
+
+
+available functions:
+
+os_package_install                                                              
+virt_env_install
+pip_install
+uwsgi_install_setup
+django_install                                                                     
+django_edge_dev_install
+edge_secret_keyconf
+nginx_install 
+django_template_install
+install_postgresql
+display_help
+run_test_server
+create_superuser
+

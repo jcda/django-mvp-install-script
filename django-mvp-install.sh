@@ -73,7 +73,7 @@ fi
 ###########################################################
 
 os_package_install(){
-  $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3
+  $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3 curl
   echo "package install done"
 
 ###########################################################
@@ -130,6 +130,10 @@ fi
 
 ###########################################################
 #    3.b. installation of django                          #
+# the version number can be passed a parameter for        #
+# enforcing an earlier version of django                  #
+# by default, the latest will be installed                #
+#							  #
 ###########################################################
 
 django_install(){
@@ -225,6 +229,65 @@ if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
    cat local.sample.env | sed '/SECRET_KEY/d' > local.env
    MAGIC_KEY=`python -c 'import random; import string; print("".join([random.SystemRandom().choice(string.digits + string.ascii_letters + string.punctuation) for i in range(100)]))'`
    echo "SECRET_KEY="$MAGIC_KEY >> local.env
+
+###########################################################
+#         migration of the sqlite database                #
+###########################################################
+
+    cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src
+    ./manage.py migrate
+
+###########################################################
+#         creation of a superuser account                 #
+###########################################################
+
+
+    echo "django edge installed"
+    echo "now you need to create a superuser account "
+    echo " edge_dev `date`">> $WORK_DIRECTORY/$PROJECT_NAME/.log
+else
+   echo " Well, this is disappointing, but django wasnt installed beforehand "
+  exit
+fi
+}
+###########################################################
+# Making the secret key hack for edge reuseable           #
+#                                                         #
+###########################################################
+
+edge_secret_keyconf(){
+   echo " installation of the local.env file in settings"
+   cd $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/$PROJECT_NAME/settings/
+   cat local.sample.env | sed '/SECRET_KEY/d' > local.env
+   MAGIC_KEY=`python -c 'import random; import string; print("".join([random.SystemRandom().choice(string.digits + string.ascii_letters + string.punctuation) for i in range(100)]))'`
+   echo "SECRET_KEY="$MAGIC_KEY >> local.env
+}
+
+###########################################################
+# 4a: installation of th djangoproject                    #
+# the template will be passed as parameter to the function#
+# if no parameter is sent, the default will be edge       # 
+###########################################################
+
+django_template_install(){
+if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
+
+   source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
+   cd $WORK_DIRECTORY/$PROJECT_NAME
+   if [$# -ne 0]
+       django-admin.py startproject --template=$1 --extension=py,md,html,env $PROJECT_NAME
+   else
+       django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
+       edge_secret_keyconf
+   fi 
+   chmod +x $WORK_DIRECTORY/$PROJECT_NAME/$PROJECT_NAME/src/manage.py
+
+###########################################################
+#         installation of the packages                    #
+###########################################################
+
+   cd $PROJECT_NAME
+   pip install -r requirements.txt
 
 ###########################################################
 #         migration of the sqlite database                #
