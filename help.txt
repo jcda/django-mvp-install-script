@@ -25,4 +25,22 @@ install_postgresql
 display_help
 run_test_server
 create_superuser
+nuke project
 
+
+main parameters:
+
+""
+base
+all
+all-prod
+os
+virtualenv
+pip
+django
+edge
+uwsgi
+nginx
+runserver
+superuser
+nuke

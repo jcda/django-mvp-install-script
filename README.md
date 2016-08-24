@@ -1,106 +1,64 @@
+# Originally this project was a presentation and a demo
+now it's a tool to deploy a Django framework with 
+nginx server, postgresql database on a Debian Linux distribution
 
-# mvp-notes
-#Introduction
-This repository contains Notes and links from an  mvp presentation for Barcelona's Big Data Startups.
-Originally I was just a slide presentation with informations to share, then I added a script to automate the installation process of a django framework
-then I added also a bookmark html file with important links to visit.
+as became bigger and bigger, the single file script will have to be revised
+some time in the future, also, the simple use of Bash will have to be
+re-thought later.
 
-# Pre requisites
-
-## Bash
-Bash ( Bourne Again Shell )is a command line interface
-http://www.tldp.org
-http://tldp.org/guides.html
-http://tldp.org/LDP/Bash-Beginners-Guide/html/index.html
-http://tldp.org/LDP/abs/html/index.html
-
-## Ssh
-http://www.openssh.com
-
-### note: generate a rsa key to have a password-less connection
-ssh-keygen -t rsa  <return> <return> <return>
-
-## Git
-
-http://www.git-scm.com
-
-http://www.github.com
-http://www.bitbucket.com
-
-## Text editor
-
-vim
-http://www.vim.org
-run "vimtutor es"  to go through a 20 minutes training on the computer where you have installed vim
-
-emacs
-gnu.org/software/emacs/
-
-## a database
- for basic test and development use: sqlite3
- for more advanced work: Postgresql
-
-## for MS Windows
-cygwin
-
-# Basic Concepts
+#pre-requisites: a debian 8 server with root access, ( please learn how to use
+sudo )
 
 
-# Where to get help ?
-## Free
-duckduckgo
-stackoverflow
-Github
-IRC
-Youtube
-## Paying
-
-### Elance
-   personal experience: not that great
-### Airpair
-   personal experience: great assistance. This is a mentorship, not someone doing the work for you.
-
-### Books
-http://oreilly.com
-
-# Breaking down the project
-
-## linux documention
-online
-
-manpages
-
-nginx
-fail2ban
-logwatch
-tmux
+# installation
 
 
-## Python
-
-virtualenv
-
-## django
-the project site
-
-the official tutorial
-
-## Django edge
-
-https://github.com/arocks/edge
-
-## uWSGI
-
-## Databases
+# step by step use
 
 
-# more
-## Celery
-http://celery.readthedocs.org/en/latest/django/first-steps-with-django.html
 
-## Cloud services
+# as said in the manual
 
-## IDE
 
-pycharm
-atom.io
+NAME
+    django-mvp-install.sh installs a webserver and a complete
+turn-key framework automagically
+SYNOPSIS
+    django-mvp-install.sh [OPTION]
+DESCRIPTION
+    This tool is to automate the installation process of a basic django website
+    the options are the following :
+    - base: [meta] installs a virtual environment with the base of python 3, pip
+    separated from the OS, and django. Warning: OS dependances will have to be
+    installed first install Brew and Xcode on MacOSX platform or run this script
+    with os as parameter.
+    - all : [meta] install the whole shebang following the path defined in the script
+    for development purpose, the database used is sqlite in thie s case,
+    but can be transfered to postgresql later on
+    - os : install all the components required from the OS side, picture
+    libraries for Pillow installation, and others. ROOT PRIVILEGES ARE REQUIRED
+    - virtualenv : create a chrooted environment for the python project
+     that doesnt impact on the rest of the server configuration
+    - pip : installs a separated pip for the virtual ENVIRONMENT.
+    - django : install django in the separated virtual environment previously
+    created. It requires pip to be installed
+    - edge : installs the django template edge. It requires django and pip to
+    be already installed
+    - nginx : [under construction ] setups the nginx http server. ROOT PRIVILEGES ARE REQUIRED.
+    - uwsgi : [under construction ]setups uwsgi to work with nginx. ROOT PRIVILEGES ARE REQUIRED
+    - runserver : will run locally a test webserver for your tests on the port 8000
+    - superuser : invokes the command to create a superuser account
+
+ENVIRONMENT
+    on the first run of this script, a .mvprc file is created in the
+    home directory of the user it contains the default variables used
+    by the script this will work out of the box with the default variables, but
+    you should personalize them.
+
+   WORK_DIRECTORY   default: /home/jcda/demo
+   PROJECT_NAME     default: YourProject
+   EDGE_URL         default: https://github.com/arocks/edge/archive/master.zip
+   PYPI_URL         default: https://pypi.python.org/packages/source/s/setuptools/setuptools-1.1.6.tar.gz
+   INSTALL_CMD      default: "sudo apt-get install"
+   ADMIN_EMAIL      default:"root@localhost.localdomain"
+

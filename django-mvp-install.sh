@@ -140,7 +140,7 @@ django_install(){
 
 if grep -q pip $WORK_DIRECTORY/$PROJECT_NAME/.log; then
     source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-    if [$# -ne 1]
+    if [$# -ne 1]; then
        pip install Django
     else
        echo $1 is the number of the django version to be installed
@@ -274,7 +274,7 @@ if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
    cd $WORK_DIRECTORY/$PROJECT_NAME
-   if [$# -ne 0]
+   if [$# -ne 0]; then
        django-admin.py startproject --template=$1 --extension=py,md,html,env $PROJECT_NAME
    else
        django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
@@ -399,6 +399,17 @@ install_postgresql(){
 echo "temporary dummy"
 echo "Postgresql installation and setup done"
 }
+
+##########################################################
+# Nuke is an option to delete the project directory      #
+# this is very primitive but exists                      #
+##########################################################
+nuke_project(){
+echo "this is too late to go back now"
+
+}
+
+
 ###########################################################
 # Help page                                               #
 ###########################################################
