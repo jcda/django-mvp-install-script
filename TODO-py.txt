@@ -1,0 +1,23 @@
+- create a table for the menu
+
+
+- move text conf file for .mvprc to a JSON format
+-------------------------------------
+- TDD validation 
+-------------------------------------
+
+- create safeguards for the .mvprc file
+    - is ~/.mvprc present
+    - is ~/.mvprc consistent
+    - is ~/.mvprc containing all the parameters otherwise, are the defaults taken ? is there an alert ?
+    - are the ~/.mvprc path parameters existing ?
+
+    - is the os Linux ?
+    - Nginx Safeguards
+         - are the project path corrects and the files reachable ?
+         - are the logs correctly mentioned
+    - Uwsgi Safeguards
+         - are the project path corrects and the files reachable ?
+         - are the logs correctly mentioned
+    - Firewall Safeguards
+         - is the firewall configuration reachable

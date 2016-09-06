@@ -140,7 +140,7 @@ django_install(){
 
 if grep -q pip $WORK_DIRECTORY/$PROJECT_NAME/.log; then
     source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
-    if [$# -ne 1]; then
+    if [ -n "$1" ]; then
        pip install Django
     else
        echo $1 is the number of the django version to be installed
@@ -274,7 +274,7 @@ if grep -q django $WORK_DIRECTORY/$PROJECT_NAME/.log; then
 
    source $WORK_DIRECTORY/$PROJECT_NAME/bin/activate
    cd $WORK_DIRECTORY/$PROJECT_NAME
-   if [$# -ne 0]; then
+   if [ -n "$1" ]; then
        django-admin.py startproject --template=$1 --extension=py,md,html,env $PROJECT_NAME
    else
        django-admin.py startproject --template=$EDGE_URL --extension=py,md,html,env $PROJECT_NAME
@@ -417,8 +417,22 @@ echo "Postgresql installation and setup done"
 ##########################################################
 nuke_project(){
 echo "this is too late to go back now"
+
+# removal of the project directory
+##########################################################
+
 rm -rf $WORK_DIRECTORY/$PROJECT_NAME
+
 echo "removal of nginx, the database and uwsgi not implemented yet"
+
+# removal of the nginx service
+##########################################################
+
+
+# removal of the database
+##########################################################
+
+
 }
 
 
@@ -548,8 +562,13 @@ case $1 in
    "edge")
      django_edge_dev_install;;
    "cms")
+     virt_env_install &&
+     pip_install &&
+     django_install 1.8 &&
      django_template_install $CMS_URL;;
    "cms1p")
+     pip_install &&
+     django_install 1.8 &&
      django_template_install $CMS1P_URL;;
    "uwsgi")
      uwsgi_install_setup;;

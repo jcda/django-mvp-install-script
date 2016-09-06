@@ -3,7 +3,7 @@ available variables:
 WORK_DIRECTORY
 PROJECT_NAME
 EDGE_URL
-CMS1L_URL
+CMS1P_URL
 CMS_URL
 PYPI_URL
 INSTALL_CMD
@@ -26,6 +26,8 @@ display_help
 run_test_server
 create_superuser
 nuke_project
+cms
+cms1p
 
 
 main parameters:
