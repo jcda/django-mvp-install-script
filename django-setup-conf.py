@@ -12,19 +12,20 @@ import argparse
 #
 ###########################################################
 
-class mvprc():
-    WorkDirectory=UserHome+"/mvp-demo"
-    ProjectName="mvp"
-    EdgeUrl="https://github.com/arocks/edge/archive/master.zip"
-    CMS1PUrl="https://github.com/jcda/djangocms-onepage-template/archive/master.zip"
-    CMSUrl="https://github.com/jcda/djangocms-template/archive/master.zip"
-    PypiUrl="https://bootstrap.pypa.io/ez_setup.py"
-    InstallCmd="sudo apt-get install"
-    AdminEmail="root@localhost.localdomain"
-    return
+#class mvprc():
+#    WorkDirectory=UserHome+"/mvp-demo"
+#    ProjectName="mvp"
+#    EdgeUrl="https://github.com/arocks/edge/archive/master.zip"
+#    CMS1PUrl="https://github.com/jcda/djangocms-onepage-template/archive/master.zip"
+#    CMSUrl="https://github.com/jcda/djangocms-template/archive/master.zip"
+#    PypiUrl="https://bootstrap.pypa.io/ez_setup.py"
+#    InstallCmd="sudo apt-get install"
+#    AdminEmail="root@localhost.localdomain"
  
 
 def params_declaration():
+
+    return
 
 ###########################################################
 # packages required by debian8 
@@ -40,7 +41,7 @@ InstallPackageCommand = "sudo apt-get install"
 # The method might be a bit tidious, but i am trying to keep all this readable
 # and easily updatable by someone else
 
-MenuOptions= " {
+MenuOptions= { 
     ["os", "os_package_install()", "installation of all the OS requirements"],
     ["virtual", "virt_env_install()", "installation of the virtual environment in the work directory"],
     ["pip", "pip_install()", "installation of the latest version of pip in the virtual environment"],
@@ -88,13 +89,9 @@ else:
    
     file = open(ConfFile,"w")
 
-
-test_functions()
-    import django-setup-test as test
-    test
- 
 ###########################################################
 def display_help():
+    return
 
 ###########################################################
 def call_env_vars():
@@ -105,40 +102,7 @@ def display_help():
     return
 
 ###########################################################
-def os_package_install():
-    return
-
-###########################################################
-def virt_env_install():
-    return
-     
-###########################################################
-def pip_install():
-    return
-
-     
-###########################################################
-def django_install():
-    return
-     
-###########################################################
-def django_edge_install():
-    return
-
-###########################################################
 def uwsgi_install_setup():
-    return
-
-
-###########################################################
-def nginx_install():
-return
-
-
-###########################################################
-# records the events in a log files
-#
-def log_event()
     return
 
 ###########################################################
