@@ -5,8 +5,8 @@ def install_nginx():
 def remove_nginx():
     return
 
-def setup_uwsgi()
+def setup_uwsgi():
     return
 
-def remove_uwsgi()
+def remove_uwsgi():
     return

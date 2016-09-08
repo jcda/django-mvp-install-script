@@ -4,6 +4,8 @@ import os
 import subprocess
 import sys
 import argparse
+import mylibs.nginx
+import mylibs.system
 
 
 ###########################################################
@@ -23,9 +25,8 @@ import argparse
 #    AdminEmail="root@localhost.localdomain"
  
 
-def params_declaration():
-
-    return
+#def params_declaration():
+#    return
 
 ###########################################################
 # packages required by debian8 
@@ -41,23 +42,35 @@ InstallPackageCommand = "sudo apt-get install"
 # The method might be a bit tidious, but i am trying to keep all this readable
 # and easily updatable by someone else
 
-MenuOptions= { 
-    ["os", "os_package_install()", "installation of all the OS requirements"],
-    ["virtual", "virt_env_install()", "installation of the virtual environment in the work directory"],
-    ["pip", "pip_install()", "installation of the latest version of pip in the virtual environment"],
-    ["uwsgi", "uwsgi_install_setup()", " installation of the uwsgi service for the project"],
-    ["django", "django_install()", "installation of django in the virtual environment"],
-    ["edge", "django_edge_dev_install()", "installation of a django project with the use of the edge template"],
-    ["nginx", "nginx_install()", " installation and setup of the service project "],
-    ["postgres", "install_postgresql()", " setup and configuration of the postgresql dbase"],
-    ["help", "display_help()", " display help"],
-    ["test", "run_test_server()", "run a local server on the port 8000 for verification"],
-    ["superuser", "create_superuser()", "create a superuser for the django admin interface"],
-    ["nuke", "nuke_project()", "erase everything"],
-    ["cms", "cms", "install a djangoCMS project"],
-    ["cms1p", "cms1p", "install a DjangoCMS as a one page project a la wordpress"],
-    }
-    
+MenuOptions= [ 
+    ("os", "os_package_install()", "installation of all the OS requirements"),
+    ("virtual", "virt_env_install()", "installation of the virtual environment in the work directory"),
+    ("pip", "pip_install()", "installation of the latest version of pip in the virtual environment"),
+    ("uwsgi", "uwsgi_install_setup()", " installation of the uwsgi service for the project"),
+    ("django", "django_install()", "installation of django in the virtual environment"),
+    ("edge", "django_edge_dev_install()", "installation of a django project with the use of the edge template"),
+    ("nginx", "nginx_install()", " installation and setup of the service project "),
+    ("postgres", "install_postgresql()", " setup and configuration of the postgresql dbase"),
+    ("help", "display_help()", " display help"),
+    ("test", "run_test_server()", "run a local server on the port 8000 for verification"),
+    ("superuser", "create_superuser()", "create a superuser for the django admin interface"),
+    ("nuke", "nuke_project()", "erase everything"),
+    ("cms", "cms", "install a djangoCMS project"),
+    ("cms1p", "cms1p", "install a DjangoCMS as a one page project a la wordpress"),
+    ]
+ 
+    ######################################################################################
+    # getting all the options of the table in the argparser this hould help for clarity
+    #
+Choices = []
+Descriptions = []
+InvokeFunction = []
+for Option in MenuOptions:
+    Choices.append(Option[0])
+    Descriptions.append(Option[2])
+    InvokeFunction.append(Option[1])
+
+   
 ###########################################################
 # Detect if ~/.mvprc exists if it doesnt, create the file 
 # and exit with an error message
@@ -125,10 +138,7 @@ def menu():
     return
 
 
-def _main_():
-
-
-    return
+def main():
     call_env_vars()
     
     if len(argv) < 2:
@@ -141,28 +151,17 @@ def _main_():
 #
 #
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser(description='Installs a django framework partially or completely.')
+parser = argparse.ArgumentParser(description='Installs a django framework partially or completely.')
+#parser.add_argument('action', choices=['os','virtualenv','pip','django','cms1','cms','nginx','postgresql','createsuperuser','test-site','nuke'],required=True)
+parser.add_argument('-f', help = ' for a different configuration file', action = 'store')
+for Option in MenuOptions:
+    parser.add_argument( Option[0],  help = Option[2], action = Option[1] )
 
-    ######################################################################################
-    # getting all the options of the table in the argparser this hould help for clarity
-    #
-    Choices = []
-    Descriptions = []
-    InvokeFunction = []
-    for Option in MenuOptions:
-        Choices.append(Option[0])
-        Descriptions.append(Option[2])
-        InvokeFunction.append(Option[1])
-
-    #parser.add_argument('action', choices=['os','virtualenv','pip','django','cms1','cms','nginx','postgresql','createsuperuser','test-site','nuke'],required=True)
-    parser.add_argument('action', choices=Choices,required=True,help=Descriptions, action=InvokeFunction)
-    parser.add_argument('--file', dest='conf_file', action='store_conf',
-                    const=sum, default=none,
-                    help='get the configuration from a different file from the default .mvprc')
-
-    #sys.exit(main(sys.argv))
+#parser.add_argument('action', choices=Choices, required=True,help=Descriptions, action=InvokeFunction)
+#parser.add_argument('--file', dest='conf_file', action='store_conf', const=sum, default=none, help='get the configuration from a different file from the default .mvprc')
+#sys.exit(main(sys.argv))
 
 
 

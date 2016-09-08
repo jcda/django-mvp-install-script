@@ -3,22 +3,22 @@ import sys
 import subprocess
 
 ###########################################################
-def log_event()
+def log_event():
     return
 
 ###########################################################
-def os_package_install(PackageList)
+def os_package_install(PackageList):
 
     subprocess.call(["sudo apt-get install", PackageList ])
 
     return
 
 ###########################################################
-def setup_firewall()
+def setup_firewall():
     return
 
 ###########################################################
-def setup_fail2ban()
+def setup_fail2ban():
     return
 
 ###########################################################
