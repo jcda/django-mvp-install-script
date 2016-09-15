@@ -73,7 +73,7 @@ fi
 ###########################################################
 
 os_package_install(){
-  $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3 curl
+  $INSTALL_CMD tmux python exim4 python3-dev fail2ban mutt logwatch python3.4-venv libjpeg-dev zlib1g-dev sqlite3 curl mosh
   echo "package install done"
 
 ###########################################################
